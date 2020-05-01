@@ -2,16 +2,13 @@ package com.crmbl.flying_mod;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.entity.IEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.ElytraModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerModelPart;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -30,25 +27,12 @@ public class FlyingModItemLayer<T extends LivingEntity, M extends EntityModel<T>
     public void render(MatrixStack matrixStackIn, IRenderTypeBuffer bufferIn, int packedLightIn, T entitylivingbaseIn, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         ItemStack itemstack = entitylivingbaseIn.getItemStackFromSlot(EquipmentSlotType.CHEST);
         if (itemstack.getItem() == FlyingModItems.FLYING_ITEM.get()) {
-            ResourceLocation resourcelocation;
-            if (entitylivingbaseIn instanceof AbstractClientPlayerEntity) {
-                AbstractClientPlayerEntity abstractclientplayerentity = (AbstractClientPlayerEntity)entitylivingbaseIn;
-                if (abstractclientplayerentity.isPlayerInfoSet() && abstractclientplayerentity.getLocationElytra() != null) {
-                    resourcelocation = abstractclientplayerentity.getLocationElytra();
-                } else if (abstractclientplayerentity.hasPlayerInfo() && abstractclientplayerentity.getLocationCape() != null && abstractclientplayerentity.isWearing(PlayerModelPart.CAPE)) {
-                    resourcelocation = abstractclientplayerentity.getLocationCape();
-                } else {
-                    resourcelocation = TEXTURE_ITEM;
-                }
-            } else {
-                resourcelocation = TEXTURE_ITEM;
-            }
 
             matrixStackIn.push();
             matrixStackIn.translate(0.0D, 0.0D, 0.125D);
             this.getEntityModel().copyModelAttributesTo(this.modelItem);
             this.modelItem.setRotationAngles(entitylivingbaseIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
-            IVertexBuilder ivertexbuilder = ItemRenderer.getBuffer(bufferIn, this.modelItem.getRenderType(resourcelocation), false, itemstack.hasEffect());
+            IVertexBuilder ivertexbuilder = ItemRenderer.getBuffer(bufferIn, this.modelItem.getRenderType(TEXTURE_ITEM), false, itemstack.hasEffect());
             this.modelItem.render(matrixStackIn, ivertexbuilder, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
             matrixStackIn.pop();
         }

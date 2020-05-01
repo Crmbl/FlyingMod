@@ -17,22 +17,37 @@ import net.minecraftforge.fml.LogicalSide;
 
 public class FlyingModEventHandler {
 
+    //TODO render flying wings to others
+
     @SubscribeEvent
     public void onPlayerTick(TickEvent.PlayerTickEvent event) {
-        if (event.phase == TickEvent.Phase.END) {
+        if (event.phase == TickEvent.Phase.START) {
             PlayerEntity player = event.player;
             if (player == null)
                 return;
 
-            if (event.side == LogicalSide.CLIENT) {
-                player.abilities.allowFlying = player.inventory.armorInventory.get(2).getItem() instanceof FlyingModItem;
-
-                if (player.abilities.allowFlying) {
-                    player.abilities.setFlySpeed(0.04f);
-                }
-                else {
-                    player.abilities.setFlySpeed(0.05f);
+            boolean isInWater = player.isInWater();
+            boolean isFlyingModItem = player.inventory.armorInventory.get(2).getItem() instanceof FlyingModItem;
+            if (event.side == LogicalSide.SERVER) {
+                if (player.abilities.allowFlying && !isFlyingModItem || isInWater) {
+                    player.abilities.allowFlying = false;
                     player.abilities.isFlying = false;
+                    player.sendPlayerAbilities();
+                }
+                if (!player.abilities.allowFlying && isFlyingModItem && !isInWater) {
+                    player.abilities.allowFlying = true;
+                    player.sendPlayerAbilities();
+                }
+            }
+
+            if (event.side == LogicalSide.CLIENT) {
+                if (player.abilities.allowFlying && player.abilities.getFlySpeed() != 0.02f) {
+                    player.abilities.setFlySpeed(0.04f);
+                    player.sendPlayerAbilities();
+                }
+                if (!player.abilities.allowFlying && player.abilities.getFlySpeed() != 0.05f) {
+                    player.abilities.setFlySpeed(0.05f);
+                    player.sendPlayerAbilities();
                 }
             }
         }
@@ -55,10 +70,8 @@ public class FlyingModEventHandler {
 
             if (player != null) {
                 ItemStack itemStack = player.getItemStackFromSlot(EquipmentSlotType.CHEST);
-
-                if (itemStack.getItem() instanceof FlyingModItem) {
+                if (itemStack.getItem() instanceof FlyingModItem)
                     itemStack.damageItem(10, player, playerEntity -> { /*TODO play sound here*/ });
-                }
             }
         }
     }
@@ -77,7 +90,7 @@ public class FlyingModEventHandler {
 
     @OnlyIn(Dist.CLIENT)
     @SubscribeEvent
-    public void entityConstructingEvent(EntityEvent.EntityConstructing event) { //TODO is visible for everyone ?
+    public void entityConstructingEvent(EntityEvent.EntityConstructing event) {
         if (event.getEntity() instanceof PlayerEntity) {
             PlayerRenderer playerRenderer = Minecraft.getInstance().getRenderManager().getSkinMap().get("default");
             playerRenderer.addLayer(new FlyingModItemLayer<>(playerRenderer));
