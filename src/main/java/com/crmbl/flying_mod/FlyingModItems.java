@@ -10,7 +10,7 @@ public class FlyingModItems {
     public static final RegistryObject<Item> FLYING_ITEM = ITEMS.register("flying_item", () ->
             new FlyingModItem(new ElytraItem.Properties()
                     .maxStackSize(1)
-                    .maxDamage(5)
+                    .maxDamage(30)
                     .group(ItemGroup.TRANSPORTATION)
             )
     );
