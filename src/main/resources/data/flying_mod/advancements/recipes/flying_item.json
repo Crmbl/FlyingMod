@@ -19,7 +19,7 @@
     "has_the_recipe": {
       "trigger": "minecraft:recipe_unlocked",
       "conditions": {
-        "recipe": "minecraft:flying_item"
+        "recipe": "flying_mod:flying_item"
       }
     }
   },
